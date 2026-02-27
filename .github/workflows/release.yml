@@ -1,0 +1,179 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install setuptools wheel
+    
+    - name: Package skills
+      run: |
+        VERSION=${{ steps.get_version.outputs.VERSION }}
+        mkdir -p release-v${VERSION}
+        
+        # Copy core files
+        cp README-GITHUB.md release-v${VERSION}/README.md
+        cp LICENSE release-v${VERSION}/
+        cp Dockerfile release-v${VERSION}/
+        cp docker-compose.yml release-v${VERSION}/
+        cp install.sh release-v${VERSION}/install.sh 2>/dev/null || cp install-deya.sh release-v${VERSION}/install.sh
+        
+        # Copy config
+        cp -r config release-v${VERSION}/
+        
+        # Copy scripts
+        cp -r scripts release-v${VERSION}/
+        chmod +x release-v${VERSION}/scripts/*.sh
+        chmod +x release-v${VERSION}/install.sh
+        
+        # Package skills from source folders
+        for skill_dir in deya-mode ui-ux-pro-max code-ninja web-hunter deya-visual-identity deya-dashboard; do
+          if [ -d "$skill_dir" ]; then
+            echo "Packaging $skill_dir..."
+            tar -czf "release-v${VERSION}/${skill_dir}-v1.0.skill" "$skill_dir/"
+          fi
+        done
+        
+        # Copy existing .skill files if source folders don't exist
+        for skill_file in *.skill; do
+          if [ -f "$skill_file" ]; then
+            cp "$skill_file" "release-v${VERSION}/"
+          fi
+        done
+        
+        # Create tarball
+        cd release-v${VERSION}
+        tar -czf ../deya-openclaw-v${VERSION}.tar.gz .
+        cd ..
+        
+        # Create ZIP
+        cd release-v${VERSION}
+        zip -r ../deya-openclaw-v${VERSION}.zip .
+        cd ..
+    
+    - name: Build Docker image
+      run: |
+        VERSION=${{ steps.get_version.outputs.VERSION }}
+        docker build -t deya/openclaw:${VERSION} .
+        docker tag deya/openclaw:${VERSION} deya/openclaw:latest
+    
+    - name: Save Docker image
+      run: |
+        VERSION=${{ steps.get_version.outputs.VERSION }}
+        docker save deya/openclaw:${VERSION} | gzip > deya-openclaw-docker-v${VERSION}.tar.gz
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-files
+        path: |
+          deya-openclaw-v*.tar.gz
+          deya-openclaw-v*.zip
+          deya-openclaw-docker-v*.tar.gz
+    
+    - name: Create Release
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          deya-openclaw-v*.tar.gz
+          deya-openclaw-v*.zip
+          deya-openclaw-docker-v*.tar.gz
+        body: |
+          ## 🌺 Deya OpenClaw Instance v${{ steps.get_version.outputs.VERSION }}
+          
+          ### 📦 Что включено
+          - 6 предустановленных скиллов
+          - Веб-интерфейс (7 страниц)
+          - One-line installer
+          - Docker образ
+          
+          ### 🚀 Быстрый старт
+          
+          **Linux/macOS:**
+          ```bash
+          curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/install.sh | bash
+          ```
+          
+          **Docker:**
+          ```bash
+          docker pull deya/openclaw:${{ steps.get_version.outputs.VERSION }}
+          docker run -p 8001:8001 deya/openclaw:${{ steps.get_version.outputs.VERSION }}
+          ```
+          
+          ### 📁 Файлы
+          - `deya-openclaw-v${{ steps.get_version.outputs.VERSION }}.tar.gz` — Полный архив
+          - `deya-openclaw-docker-v${{ steps.get_version.outputs.VERSION }}.tar.gz` — Docker образ
+          
+          ### 🔗 Ссылки
+          - [Документация](https://github.com/${{ github.repository }}#readme)
+          - [Telegram](https://t.me/dayanrouter)
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker-push:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Get version
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: |
+          deya/openclaw:${{ steps.get_version.outputs.VERSION }}
+          deya/openclaw:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max

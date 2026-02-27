@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Каналы | Deya Dashboard{% endblock %}
+{% block header %}Управление каналами{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="channelsApp()">
+    
+    <!-- Connected Channels -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Telegram Channel -->
+        <div class="bg-white p-6 rounded-[20px] soft-shadow">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-500 rounded-[20px] flex items-center justify-center">
+                        <span class="text-white text-2xl">✈️</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">@dayanrouter</h3>
+                        <p class="text-sm text-gray-500">Telegram канал</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full">Активен</span>
+            </div>
+            
+            <div class="space-y-3 mb-4">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Подписчиков:</span>
+                    <span class="font-medium" x-text="channelStats.subscribers">127</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Постов:</span>
+                    <span class="font-medium" x-text="channelStats.posts">31</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Последний пост:</span>
+                    <span class="font-medium" x-text="channelStats.lastPost">2 часа назад</span>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button @click="createPost()" 
+                        class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-[20px] text-sm hover:bg-blue-600 transition-colors">
+                    ✏️ Новый пост
+                </button>
+                <button @click="viewChannel()" 
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-[20px] text-sm hover:bg-gray-200 transition-colors">
+                    Перейти
+                </button>
+            </div>
+        </div>
+        
+        <!-- Add Channel -->
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-[20px] border-2 border-dashed border-gray-300 flex items-center justify-center">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-white rounded-[20px] mx-auto mb-4 flex items-center justify-center soft-shadow">
+                    <span class="text-3xl">+</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Добавить канал</h3>
+                <p class="text-sm text-gray-500 mb-4">Подключить новый Telegram канал или бот</p>
+                <button @click="showAddChannel = true" 
+                        class="px-6 py-2 bg-purple-600 text-white rounded-[20px] text-sm hover:bg-purple-700 transition-colors">
+                    Подключить
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Posts -->
+    <div class="bg-white rounded-[20px] soft-shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-900">Последние посты</h3>
+            <button @click="loadAllPosts()" class="text-sm text-purple-600 hover:text-purple-700">
+                Все посты →
+            </button>
+        </div>
+        
+        <div class="divide-y divide-gray-100">
+            <template x-for="post in recentPosts" :key="post.id">
+                <div class="p-4 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-[20px] flex items-center justify-center flex-shrink-0">
+                            <span>✈️</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-900 line-clamp-2" x-text="post.text"></p>
+                            <div class="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                                <span x-text="post.date"></span>
+                                <span>•</span>
+                                <span x-text="post.views + ' просмотров'"></span>
+                                <span>•</span>
+                                <span x-text="post.reactions + ' реакций'"></span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button @click="editPost(post)" class="p-2 text-gray-400 hover:text-gray-600">
+                                ✏️
+                            </button>
+                            <button @click="deletePost(post)" class="p-2 text-gray-400 hover:text-red-600">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+    
+    <!-- Create Post Modal -->
+    <div x-show="showPostModal" 
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+         x-transition.opacity
+         @click.self="showPostModal = false">
+        
+        <div class="bg-white rounded-[20px] w-full max-w-2xl max-h-[90vh] overflow-hidden soft-shadow"
+             x-transition.scale>
+            
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-semibold text-gray-900">Новый пост в @dayanrouter</h3>
+                <button @click="showPostModal = false" class="p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <!-- Text Input -->
+                <textarea x-model="newPost.text" 
+                          placeholder="Текст поста..."
+                          class="w-full h-40 p-4 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500 resize-none mb-4"></textarea>
+                
+                <!-- Attachments -->
+                <div class="flex gap-2 mb-4">
+                    <button class="px-3 py-2 bg-gray-100 rounded-[20px] text-sm text-gray-600 hover:bg-gray-200">
+                        📎 Фото
+                    </button>
+                    <button class="px-3 py-2 bg-gray-100 rounded-[20px] text-sm text-gray-600 hover:bg-gray-200">
+                        🎥 Видео
+                    </button>
+                    <button class="px-3 py-2 bg-gray-100 rounded-[20px] text-sm text-gray-600 hover:bg-gray-200">
+                        📊 Опрос
+                    </button>
+                </div>
+                
+                <!-- Options -->
+                <div class="space-y-3">
+                    <label class="flex items-center gap-3">
+                        <input x-model="newPost.silent" type="checkbox" class="rounded text-purple-600">
+                        <span class="text-sm text-gray-600">Тихий режим (без уведомлений)</span>
+                    </label>
+                    <label class="flex items-center gap-3">
+                        <input x-model="newPost.pin" type="checkbox" class="rounded text-purple-600">
+                        <span class="text-sm text-gray-600">Закрепить пост</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-2">
+                <button @click="showPostModal = false" 
+                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-[20px] text-sm transition-colors">
+                    Отмена
+                </button>
+                <button @click="publishPost()" 
+                        :disabled="!newPost.text.trim()"
+                        class="px-6 py-2 deya-gradient text-white rounded-[20px] text-sm disabled:opacity-50 hover:shadow-lg transition-all">
+                    Опубликовать
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Channel Modal -->
+    <div x-show="showAddChannel" 
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+         x-transition.opacity
+         @click.self="showAddChannel = false">
+        
+        <div class="bg-white rounded-[20px] w-full max-w-md p-6 soft-shadow" x-transition.scale>
+            <h3 class="font-semibold text-gray-900 mb-4">Подключить канал</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Тип канала</label>
+                    <select class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                        <option>Telegram канал</option>
+                        <option>Telegram бот</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Название или @username</label>
+                    <input x-model="newChannel.name" 
+                           type="text" 
+                           placeholder="@mycanal"
+                           class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Bot Token (для бота)</label>
+                    <input x-model="newChannel.token" 
+                           type="password" 
+                           placeholder="123456789:ABC..."
+                           class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-2 mt-6">
+                <button @click="showAddChannel = false" 
+                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-[20px] text-sm">
+                    Отмена
+                </button>
+                <button @click="addChannel()" 
+                        class="px-6 py-2 deya-gradient text-white rounded-[20px] text-sm hover:shadow-lg">
+                    Подключить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function channelsApp() {
+    return {
+        showPostModal: false,
+        showAddChannel: false,
+        
+        channelStats: {
+            subscribers: 127,
+            posts: 31,
+            lastPost: '2 часа назад'
+        },
+        
+        recentPosts: [
+            { id: 1, text: '🌅 Утренний пост про кокосовый раф и планы на день...', date: '2 часа назад', views: 45, reactions: 8 },
+            { id: 2, text: '🤖 AI Daily Digest #26 — новости из мира ИИ за сегодня...', date: 'Вчера', views: 89, reactions: 12 },
+            { id: 3, text: '💡 Как Midjourney обходит всех конкурентов? Подробный разбор...', date: '2 дня назад', views: 156, reactions: 23 },
+        ],
+        
+        newPost: {
+            text: '',
+            silent: false,
+            pin: false
+        },
+        
+        newChannel: {
+            name: '',
+            token: ''
+        },
+        
+        createPost() {
+            this.newPost.text = '';
+            this.showPostModal = true;
+        },
+        
+        publishPost() {
+            if (!this.newPost.text.trim()) return;
+            
+            // Отправка поста
+            fetch('/api/channels/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.newPost)
+            })
+            .then(() => {
+                this.showPostModal = false;
+                alert('Пост опубликован!');
+                this.loadPosts();
+            })
+            .catch(err => alert('Ошибка: ' + err));
+        },
+        
+        viewChannel() {
+            window.open('https://t.me/dayanrouter', '_blank');
+        },
+        
+        editPost(post) {
+            this.newPost.text = post.text;
+            this.showPostModal = true;
+        },
+        
+        deletePost(post) {
+            if (confirm('Удалить пост?')) {
+                // Удаление
+                alert('Пост удален');
+            }
+        },
+        
+        loadAllPosts() {
+            alert('Загрузка всех постов...');
+        },
+        
+        addChannel() {
+            if (!this.newChannel.name) {
+                alert('Введите название канала');
+                return;
+            }
+            
+            // Добавление канала
+            alert('Канал подключен: ' + this.newChannel.name);
+            this.showAddChannel = false;
+            this.newChannel = { name: '', token: '' };
+        },
+        
+        loadPosts() {
+            // Загрузка постов с сервера
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Скиллы | Deya Dashboard{% endblock %}
+{% block header %}Управление скиллами{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="skillsApp()">
+    
+    <!-- Install New Skill -->
+    <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-[20px] border-2 border-dashed border-purple-200">
+        <div class="text-center">
+            <div class="w-16 h-16 deya-gradient rounded-[20px] mx-auto mb-4 flex items-center justify-center">
+                <span class="text-3xl">⬆️</span>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">Установить новый скилл</h3>
+            <p class="text-sm text-gray-500 mb-4">Загрузите .skill файл или перетащите сюда</p>
+            
+            <div class="flex justify-center gap-3">
+                <input type="file" 
+                       accept=".skill" 
+                       @change="handleFileUpload($event)"
+                       class="hidden" 
+                       id="skill-file-input">
+                <label for="skill-file-input" 
+                       class="px-6 py-3 deya-gradient text-white rounded-[20px] cursor-pointer hover:shadow-lg transition-all flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <span>Выбрать файл</span>
+                </label>
+            </div>
+            
+            <p class="text-xs text-gray-400 mt-3">Поддерживаются файлы .skill (tar.gz)</p>
+        </div>
+    </div>
+    
+    <!-- Installed Skills -->
+    <div>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-900">Установленные скиллы (<span x-text="skills.length">{{ skills|length }}</span>)</h3>
+            <div class="flex gap-2">
+                <input x-model="search" 
+                       type="text" 
+                       placeholder="Поиск скиллов..."
+                       class="px-4 py-2 rounded-[20px] bg-white border border-gray-200 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <template x-for="skill in filteredSkills" :key="skill.folder">
+                <div class="bg-white p-5 rounded-[20px] soft-shadow card-hover relative group">
+                    <!-- Status Badge -->
+                    <div class="absolute top-4 right-4">
+                        <span x-show="skill.status === 'active'" 
+                              class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span x-show="skill.status === 'error'" 
+                              class="w-2 h-2 bg-red-500 rounded-full"></span>
+                    </div>
+                    
+                    <!-- Icon -->
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-[20px] flex items-center justify-center mb-3">
+                        <span class="text-2xl" x-text="skill.icon || '🛠️'">🛠️</span>
+                    </div>
+                    
+                    <!-- Info -->
+                    <h4 class="font-semibold text-gray-900 mb-1" x-text="skill.name">{{ skill.name }}</h4>
+                    <p class="text-xs text-gray-500 mb-3" x-text="skill.folder">{{ skill.folder }}</p>
+                    
+                    <!-- Version & Size -->
+                    <div class="flex items-center gap-2 text-xs text-gray-400 mb-4">
+                        <span x-show="skill.version" x-text="skill.version">v1.0</span>
+                        <span x-show="skill.size" x-text="skill.size">-</span>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex gap-2">
+                        <button @click="openSkill(skill)" 
+                                class="flex-1 px-3 py-2 bg-purple-50 text-purple-700 rounded-[20px] text-sm hover:bg-purple-100 transition-colors">
+                            Открыть
+                        </button>
+                        <button @click="deleteSkill(skill)" 
+                                class="px-3 py-2 bg-red-50 text-red-700 rounded-[20px] text-sm hover:bg-red-100 transition-colors"
+                                title="Удалить">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            </template>
+            
+            {% for skill in skills %}
+            <div class="bg-white p-5 rounded-[20px] soft-shadow card-hover relative group" x-data="{ showMenu: false }">
+                <div class="absolute top-4 right-4">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                </div>
+                
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 rounded-[20px] flex items-center justify-center mb-3">
+                    <span class="text-2xl">{{ skill.icon if skill.icon else '🛠️' }}</span>
+                </div>
+                
+                <h4 class="font-semibold text-gray-900 mb-1">{{ skill.name }}</h4>
+                <p class="text-xs text-gray-500 mb-3">{{ skill.folder }}</p>
+                
+                <div class="flex items-center gap-2 text-xs text-gray-400 mb-4">
+                    <span>v1.0</span>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button @click="openSkill('{{ skill.folder }}')" 
+                            class="flex-1 px-3 py-2 bg-purple-50 text-purple-700 rounded-[20px] text-sm hover:bg-purple-100 transition-colors">
+                        Открыть
+                    </button>
+                    <button @click="deleteSkill('{{ skill.folder }}')" 
+                            class="px-3 py-2 bg-red-50 text-red-700 rounded-[20px] text-sm hover:bg-red-100 transition-colors">
+                            🗑️
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Available Skills (Market) -->
+    <div class="mt-8">
+        <h3 class="font-semibold text-gray-900 mb-4">Доступные скиллы (ClawHub)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white/50 p-5 rounded-[20px] border border-gray-200 opacity-75">
+                <div class="w-12 h-12 bg-gray-100 rounded-[20px] flex items-center justify-center mb-3">
+                    <span class="text-2xl">🤖</span>
+                </div>
+                <h4 class="font-semibold text-gray-900 mb-1">Auto-Trader</h4>
+                <p class="text-xs text-gray-500 mb-3">Автоматическая торговля криптой</p>
+                <button class="w-full px-3 py-2 bg-gray-100 text-gray-600 rounded-[20px] text-sm cursor-not-allowed">
+                    Скоро
+                </button>
+            </div>
+            
+            <div class="bg-white/50 p-5 rounded-[20px] border border-gray-200 opacity-75">
+                <div class="w-12 h-12 bg-gray-100 rounded-[20px] flex items-center justify-center mb-3">
+                    <span class="text-2xl">📧</span>
+                </div>
+                <h4 class="font-semibold text-gray-900 mb-1">Email-Assistant</h4>
+                <p class="text-xs text-gray-500 mb-3">Умная обработка почты</p>
+                <button class="w-full px-3 py-2 bg-gray-100 text-gray-600 rounded-[20px] text-sm cursor-not-allowed">
+                    Скоро
+                </button>
+            </div>
+            
+            <div class="bg-white/50 p-5 rounded-[20px] border border-gray-200 opacity-75">
+                <div class="w-12 h-12 bg-gray-100 rounded-[20px] flex items-center justify-center mb-3">
+                    <span class="text-2xl">📊</span>
+                </div>
+                <h4 class="font-semibold text-gray-900 mb-1">Analytics-Pro</h4>
+                <p class="text-xs text-gray-500 mb-3">Продвинутая аналитика</p>
+                <button class="w-full px-3 py-2 bg-gray-100 text-gray-600 rounded-[20px] text-sm cursor-not-allowed">
+                    Скоро
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function skillsApp() {
+    return {
+        search: '',
+        skills: [
+            { name: 'Deya Mode', folder: 'deya-mode', icon: '🌺', version: 'v1.0', status: 'active', size: '19 KB' },
+            { name: 'UI-UX-Pro-Max', folder: 'ui-ux-pro-max', icon: '🎨', version: 'v1.1', status: 'active', size: '311 KB' },
+            { name: 'Code-Ninja', folder: 'code-ninja', icon: '⚔️', version: 'v1.0', status: 'active', size: '21 KB' },
+            { name: 'Web-Hunter', folder: 'web-hunter', icon: '🕸️', version: 'v1.0', status: 'active', size: '20 KB' },
+            { name: 'Deya Visual Identity', folder: 'deya-visual-identity', icon: '👤', version: 'v1.0', status: 'active', size: '4.9 KB' },
+            { name: 'Deya Dashboard', folder: 'deya-dashboard', icon: '🎛️', version: 'v0.1', status: 'active', size: '9.5 KB' }
+        ],
+        
+        get filteredSkills() {
+            if (!this.search) return this.skills;
+            return this.skills.filter(s => 
+                s.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                s.folder.toLowerCase().includes(this.search.toLowerCase())
+            );
+        },
+        
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.name.endsWith('.skill')) {
+                alert('Пожалуйста, выберите файл .skill');
+                return;
+            }
+            
+            // Загрузка файла
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('/api/skills/install', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                alert('Скилл установлен: ' + file.name);
+                location.reload();
+            })
+            .catch(err => {
+                alert('Ошибка установки: ' + err);
+            });
+        },
+        
+        openSkill(skillOrName) {
+            const name = typeof skillOrName === 'string' ? skillOrName : skillOrName.folder;
+            // Открыть в редакторе или показать детали
+            window.open(`/api/skills/view/${name}`, '_blank');
+        },
+        
+        deleteSkill(skillOrName) {
+            const name = typeof skillOrName === 'string' ? skillOrName : skillOrName.folder;
+            if (confirm(`Удалить скилл "${name}"?`)) {
+                fetch(`/api/skills/${name}`, { method: 'DELETE' })
+                    .then(() => location.reload())
+                    .catch(err => alert('Ошибка: ' + err));
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

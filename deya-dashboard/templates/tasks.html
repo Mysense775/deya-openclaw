@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Задачи | Deya Dashboard{% endblock %}
+{% block header %}Задачи и cron{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="tasksApp()">
+    
+    <!-- Cron Jobs -->
+    <div class="bg-white rounded-[20px] soft-shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-[20px] flex items-center justify-center">
+                    <span>⏰</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">Cron Jobs</h3>
+                    <p class="text-sm text-gray-500">Автоматические задачи по расписанию</p>
+                </div>
+            </div>
+            <button @click="showAddTask = true" 
+                    class="px-4 py-2 deya-gradient text-white rounded-[20px] text-sm hover:shadow-lg transition-all">
+                + Новая задача
+            </button>
+        </div>
+        
+        <div class="divide-y divide-gray-100">
+            <template x-for="job in cronJobs" :key="job.id">
+                <div class="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-2 h-2 rounded-full" :class="job.enabled ? 'bg-green-500' : 'bg-gray-400'"></div>
+                        <div>
+                            <p class="font-medium text-gray-900" x-text="job.name"></p>
+                            <p class="text-xs text-gray-500" x-text="job.schedule + ' — ' + job.command"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span x-show="job.lastRun" class="text-xs text-gray-400" x-text="'Последний запуск: ' + job.lastRun"></span>
+                        <button @click="toggleJob(job)" class="p-2 text-gray-400 hover:text-gray-600">
+                            <span x-text="job.enabled ? '⏸️' : '▶️'">⏸️</span>
+                        </button>
+                        <button @click="deleteJob(job)" class="p-2 text-gray-400 hover:text-red-600">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Static fallback -->
+            <div class="p-4 text-center text-gray-500">
+                <pre class="text-xs text-left bg-gray-50 p-4 rounded-[20px] overflow-auto">{{ cron_jobs }}</pre>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Background Processes -->
+    <div class="bg-white rounded-[20px] soft-shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-900">Background Processes</h3>
+        </div>
+        
+        <div class="p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="process in processes" :key="process.name">
+                    <div class="p-4 bg-gray-50 rounded-[20px]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-medium text-gray-900" x-text="process.name"></span>
+                            <span class="w-2 h-2 rounded-full" :class="process.running ? 'bg-green-500' : 'bg-red-500'"></span>
+                        </div>
+                        <p class="text-xs text-gray-500" x-text="process.description"></p>
+                        <div class="mt-3 flex gap-2">
+                            <button @click="restartProcess(process)" 
+                                    class="flex-1 px-3 py-1.5 bg-white rounded-[20px] text-xs text-gray-600 hover:bg-gray-100 border border-gray-200">
+                                🔄 Рестарт
+                            </button>
+                            <button @click="viewLogs(process)" 
+                                    class="px-3 py-1.5 bg-white rounded-[20px] text-xs text-gray-600 hover:bg-gray-100 border border-gray-200">
+                                📋 Логи
+                            </button>
+                        </div>
+                    </div>
+                </template>
+                
+                <!-- Static processes -->
+                <div class="p-4 bg-gray-50 rounded-[20px]">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium text-gray-900">OpenClaw Gateway</span>
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    </div>
+                    <p class="text-xs text-gray-500">Главный сервис</p>
+                </div>
+                
+                <div class="p-4 bg-gray-50 rounded-[20px]">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium text-gray-900">Telegram Bot</span>
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    </div>
+                    <p class="text-xs text-gray-500">@ai_router_support_bot</p>
+                </div>
+                
+                <div class="p-4 bg-gray-50 rounded-[20px]">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium text-gray-900">Security Monitor</span>
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    </div>
+                    <p class="text-xs text-gray-500">Каждые 30 минут</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task Queue -->
+    <div class="bg-white rounded-[20px] soft-shadow">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-900">Очередь задач</h3>
+        </div>
+        
+        <div class="p-4">
+            <div x-show="taskQueue.length === 0" class="text-center text-gray-500 py-8">
+                <span class="text-4xl mb-2 block">✅</span>
+                <p>Очередь пуста</p>
+            </div>
+            
+            <div class="space-y-2">
+                <template x-for="task in taskQueue" :key="task.id">
+                    <div class="p-3 bg-amber-50 rounded-[20px] flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="animate-spin">⏳</span>
+                            <span class="text-sm text-gray-700" x-text="task.name"></span>
+                        </div>
+                        <span class="text-xs text-gray-500" x-text="task.progress + '%'"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Task Modal -->
+    <div x-show="showAddTask" 
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+         x-transition.opacity
+         @click.self="showAddTask = false">
+        
+        <div class="bg-white rounded-[20px] w-full max-w-md p-6 soft-shadow" x-transition.scale>
+            <h3 class="font-semibold text-gray-900 mb-4">Новая cron задача</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Название</label>
+                    <input x-model="newTask.name" type="text" placeholder="Ежедневный бэкап"
+                           class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Расписание (cron)</label>
+                    <input x-model="newTask.schedule" type="text" placeholder="0 2 * * *"
+                           class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500 font-mono text-sm">
+                    <p class="text-xs text-gray-400 mt-1">Пример: 0 2 * * * = каждый день в 2:00</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Команда</label>
+                    <input x-model="newTask.command" type="text" placeholder="/root/backup.sh"
+                           class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500 font-mono text-sm">
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-600 mb-2">Быстрый выбор</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button @click="newTask.schedule = '*/30 * * * *'" class="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200">Каждые 30 мин</button>
+                        <button @click="newTask.schedule = '0 * * * *'" class="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200">Каждый час</button>
+                        <button @click="newTask.schedule = '0 2 * * *'" class="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200">Каждый день 2:00</button>
+                        <button @click="newTask.schedule = '0 9 * * 1'" class="px-3 py-1.5 bg-gray-100 rounded-full text-xs hover:bg-gray-200">Понедельник 9:00</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-2 mt-6">
+                <button @click="showAddTask = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-[20px] text-sm">
+                    Отмена
+                </button>
+                <button @click="addTask()" class="px-6 py-2 deya-gradient text-white rounded-[20px] text-sm hover:shadow-lg">
+                    Добавить
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logs Modal -->
+    <div x-show="showLogs" 
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+         x-transition.opacity
+         @click.self="showLogs = false">
+        
+        <div class="bg-white rounded-[20px] w-full max-w-4xl max-h-[80vh] overflow-hidden soft-shadow" x-transition.scale>
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-semibold text-gray-900" x-text="'Логи: ' + currentProcess"></h3>
+                <button @click="showLogs = false" class="p-2 hover:bg-gray-100 rounded-full">✕</button>
+            </div>
+            
+            <div class="p-4 bg-gray-900 text-green-400 font-mono text-sm overflow-auto max-h-[60vh]">
+                <pre x-text="logs"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function tasksApp() {
+    return {
+        showAddTask: false,
+        showLogs: false,
+        currentProcess: '',
+        logs: '',
+        
+        newTask: {
+            name: '',
+            schedule: '',
+            command: ''
+        },
+        
+        cronJobs: [
+            { id: 1, name: 'Security Monitor', schedule: '*/30 * * * *', command: '/root/security_monitor.sh', enabled: true, lastRun: '10 мин назад' },
+            { id: 2, name: 'Anti-Miner Check', schedule: '* * * * *', command: '/root/anti_miner_v3.sh', enabled: true, lastRun: '1 мин назад' },
+            { id: 3, name: 'Daily Backup', schedule: '0 2 * * *', command: '/root/backup.sh', enabled: true, lastRun: 'вчера' },
+            { id: 4, name: 'Timezone Sync', schedule: '0 * * * *', command: 'timedatectl', enabled: true, lastRun: '45 мин назад' }
+        ],
+        
+        processes: [
+            { name: 'OpenClaw Gateway', description: 'Главный сервис', running: true },
+            { name: 'Telegram Bot', description: '@ai_router_support_bot', running: true },
+            { name: 'Security Monitor', description: 'Каждые 30 минут', running: true },
+            { name: 'AI Router Backend', description: 'API сервис', running: true },
+            { name: 'AI Router Frontend', description: 'Web интерфейс', running: true }
+        ],
+        
+        taskQueue: [
+            { id: 1, name: 'Генерация поста для канала', progress: 45 }
+        ],
+        
+        addTask() {
+            if (!this.newTask.name || !this.newTask.schedule || !this.newTask.command) {
+                alert('Заполните все поля');
+                return;
+            }
+            
+            this.cronJobs.push({
+                id: Date.now(),
+                ...this.newTask,
+                enabled: true,
+                lastRun: null
+            });
+            
+            this.showAddTask = false;
+            this.newTask = { name: '', schedule: '', command: '' };
+        },
+        
+        toggleJob(job) {
+            job.enabled = !job.enabled;
+        },
+        
+        deleteJob(job) {
+            if (confirm('Удалить задачу?')) {
+                this.cronJobs = this.cronJobs.filter(j => j.id !== job.id);
+            }
+        },
+        
+        restartProcess(process) {
+            alert('Перезапуск ' + process.name);
+        },
+        
+        viewLogs(process) {
+            this.currentProcess = process.name;
+            this.logs = `[2026-02-27 19:30:15] INFO: ${process.name} started\n[2026-02-27 19:30:16] INFO: Connection established\n[2026-02-27 19:30:20] INFO: Ready to accept requests\n[2026-02-27 19:35:42] INFO: Health check OK`;
+            this.showLogs = true;
+        }
+    }
+}
+</script>
+{% endblock %}

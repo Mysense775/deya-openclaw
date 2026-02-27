@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deya UI Preview 🌺</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        accent: '#7c3aed',
+                        dark: '#0d0d12',
+                    },
+                    borderRadius: {
+                        'soft': '20px',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-sunset { background: linear-gradient(135deg, #f59e0b 0%, #ec4899 50%, #8b5cf6 100%); }
+        .gradient-ocean { background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%); }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-soft gradient-sunset flex items-center justify-center text-white font-bold text-lg">
+                    🌺
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">Deya UI Kit</h1>
+                    <p class="text-sm text-gray-500">Тёплый свет, не неоновое сияние</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="setTheme('light')" class="px-4 py-2 rounded-soft bg-gray-100 hover:bg-gray-200 text-sm font-medium transition-colors">
+                    ☀️ Light
+                </button>
+                <button onclick="setTheme('dark')" class="px-4 py-2 rounded-soft bg-gray-900 text-white hover:bg-gray-800 text-sm font-medium transition-colors">
+                    🌙 Dark
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Buttons Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                🔘 Buttons
+                <span class="text-sm font-normal text-gray-500">/ Кнопки</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Primary -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Primary</h3>
+                    <div class="space-y-3">
+                        <button class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+                            Главная кнопка
+                        </button>
+                        <button class="w-full px-6 py-3 bg-blue-600/50 text-white font-medium rounded-soft cursor-not-allowed opacity-50">
+                            Disabled
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gradient -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Gradient (Deya Style)</h3>
+                    <div class="space-y-3">
+                        <button class="w-full px-6 py-3 gradient-sunset text-white font-medium rounded-soft transition-all duration-300 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-lg">
+                            Закат 🌅
+                        </button>
+                        <button class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-soft transition-all duration-300 hover:brightness-110">
+                            Океан 🌊
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Outline & Ghost -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Outline & Ghost</h3>
+                    <div class="space-y-3">
+                        <button class="w-full px-6 py-3 border-2 border-blue-600 text-blue-600 font-medium rounded-soft hover:bg-blue-50 transition-colors">
+                            Outline
+                        </button>
+                        <button class="w-full px-6 py-3 text-blue-600 font-medium rounded-soft hover:bg-blue-50 transition-colors">
+                            Ghost
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sizes -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Sizes</h3>
+                    <div class="space-y-3">
+                        <button class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-soft">
+                            Small
+                        </button>
+                        <button class="px-6 py-3 bg-gray-900 text-white font-medium rounded-soft">
+                            Medium
+                        </button>
+                        <button class="px-8 py-4 bg-gray-900 text-white text-lg font-medium rounded-soft">
+                            Large
+                        </button>
+                    </div>
+                </div>
+
+                <!-- With Icons -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">With Icons</h3>
+                    <div class="space-y-3">
+                        <button class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-soft hover:bg-blue-700 transition-colors">
+                            <span>Продолжить</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        <button class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-medium rounded-soft hover:bg-green-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Готово</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">States</h3>
+                    <div class="space-y-3">
+                        <button class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-soft opacity-50 cursor-wait">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Загрузка...</span>
+                        </button>
+                        <button class="px-6 py-3 bg-red-600 text-white font-medium rounded-soft hover:bg-red-700 transition-colors">
+                            Danger
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cards Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                 Cards
+                <span class="text-sm font-normal text-gray-500">/ Карточки</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Default -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Базовая карточка</h3>
+                    <p class="text-gray-600">Мягкие формы, тень, hover-эффект. Как всё в AI Router.</p>
+                </div>
+
+                <!-- Gradient -->
+                <div class="rounded-soft p-6 bg-gradient-to-br from-amber-50 via-white to-purple-50 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Gradient Card</h3>
+                    <p class="text-gray-600">Тёплый градиент — закат на Бали 🌅</p>
+                </div>
+
+                <!-- Glass -->
+                <div class="glass rounded-soft p-6 border border-white/20 shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Glassmorphism</h3>
+                    <p class="text-gray-700">Прозрачность, блюр, мягкие границы.</p>
+                </div>
+
+                <!-- With Header -->
+                <div class="bg-white rounded-soft p-6 border border-gray-100">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">С заголовком</h3>
+                            <p class="text-sm text-gray-500">Подзаголовок карточки</p>
+                        </div>
+                        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Active</span>
+                    </div>
+                    <p class="text-gray-600">Карточка с заголовком, подзаголовком и бейджем.</p>
+                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-sm text-gray-500">Footer</span>
+                        <button class="text-blue-600 text-sm font-medium hover:underline">Подробнее</button>
+                    </div>
+                </div>
+
+                <!-- Dark -->
+                <div class="bg-[#0d0d12] rounded-soft p-6 border border-gray-800 text-white">
+                    <h3 class="text-lg font-semibold mb-2">Dark Mode</h3>
+                    <p class="text-gray-400">Тёмная тема для админ-панели и ночных сессий 🌙</p>
+                </div>
+
+                <!-- Elevated -->
+                <div class="bg-white rounded-soft p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Elevated</h3>
+                    <p class="text-gray-600">Поднимается при hover — всплывает как волна 🌊</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inputs Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                📝 Inputs
+                <span class="text-sm font-normal text-gray-500">/ Поля ввода</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+                <!-- Default -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input 
+                        type="email" 
+                        placeholder="your@email.com"
+                        class="w-full px-5 py-3 rounded-soft border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-gray-400"
+                    >
+                </div>
+
+                <!-- With Icon -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700">Поиск</label>
+                    <div class="relative">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input 
+                            type="text" 
+                            placeholder="Найти..."
+                            class="w-full pl-12 pr-5 py-3 rounded-soft border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-gray-400"
+                        >
+                    </div>
+                </div>
+
+                <!-- Error -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700">Пароль</label>
+                    <input 
+                        type="password" 
+                        value="123"
+                        class="w-full px-5 py-3 rounded-soft border border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition-all"
+                    >
+                    <p class="text-sm text-red-600 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Минимум 8 символов
+                    </p>
+                </div>
+
+                <!-- Success -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700">Имя пользователя</label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            value="deya_router"
+                            class="w-full px-5 py-3 rounded-soft border border-green-500 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                        >
+                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <p class="text-sm text-green-600">Отличное имя! 🌺</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Badges Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                🏷️ Badges
+                <span class="text-sm font-normal text-gray-500">/ Бейджи</span>
+            </h2>
+            
+            <div class="bg-white rounded-soft p-6 border border-gray-100">
+                <div class="flex flex-wrap gap-3">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">Default</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Primary</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Success</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Warning</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">Danger</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Secondary</span>
+                    
+                    <!-- Gradient -->
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium gradient-sunset text-white">Pro</span>
+                    
+                    <!-- With dot -->
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        Online
+                    </span>
+                    
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Pending
+                    </span>
+                    
+                    <!-- Glowing -->
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-500 text-white shadow-lg shadow-blue-500/30">New</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500 text-white shadow-lg shadow-green-500/30">Active</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Colors Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                🎨 Colors
+                <span class="text-sm font-normal text-gray-500">/ Цвета</span>
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div class="space-y-2">
+                    <div class="h-20 rounded-soft bg-blue-500"></div>
+                    <p class="text-sm font-medium text-gray-700">Primary</p>
+                    <p class="text-xs text-gray-500">#3b82f6</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="h-20 rounded-soft bg-purple-500"></div>
+                    <p class="text-sm font-medium text-gray-700">Secondary</p>
+                    <p class="text-xs text-gray-500">#8b5cf6</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="h-20 rounded-soft gradient-sunset"></div>
+                    <p class="text-sm font-medium text-gray-700">Sunset</p>
+                    <p class="text-xs text-gray-500">Gradient</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="h-20 rounded-soft bg-[#0d0d12]"></div>
+                    <p class="text-sm font-medium text-gray-700">Dark</p>
+                    <p class="text-xs text-gray-500">#0d0d12</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="h-20 rounded-soft bg-green-500"></div>
+                    <p class="text-sm font-medium text-gray-700">Success</p>
+                    <p class="text-xs text-gray-500">#10b981</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="h-20 rounded-soft bg-red-500"></div>
+                    <p class="text-sm font-medium text-gray-700">Danger</p>
+                    <p class="text-xs text-gray-500">#ef4444</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-16 pt-8 border-t border-gray-200 text-center">
+            <p class="text-gray-600">
+                Сделано с теплом и кокосовым рафом 🌺
+            </p>
+            <p class="text-sm text-gray-500 mt-2">
+                go.airouter.host
+            </p>
+        </footer>
+    </main>
+
+    <script>
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('bg-gray-900');
+                document.body.classList.remove('bg-gray-50');
+            } else {
+                document.body.classList.remove('bg-gray-900');
+                document.body.classList.add('bg-gray-50');
+            }
+        }
+    </script>
+</body>
+</html>

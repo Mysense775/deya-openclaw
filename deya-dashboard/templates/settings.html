@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}Настройки | Deya Dashboard{% endblock %}
+{% block header %}Настройки инстанса{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="settingsApp()">
+    
+    <!-- AI Model Settings -->
+    <div class="bg-white p-6 rounded-[20px] soft-shadow">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-purple-100 rounded-[20px] flex items-center justify-center">
+                <span>🤖</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-900">AI Модель</h3>
+                <p class="text-sm text-gray-500">Настройки генеративной модели</p>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm text-gray-600 mb-2">Модель по умолчанию</label>
+                <select x-model="settings.model" class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                    <option value="moonshot/kimi-k2.5">Kimi K2.5 (рекомендуется)</option>
+                    <option value="openai/gpt-4o">GPT-4o</option>
+                    <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                    <option value="google/gemini-pro">Gemini Pro</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm text-gray-600 mb-2">Temperature</label>
+                <input x-model="settings.temperature" type="range" min="0" max="1" step="0.1" 
+                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>Точный (0)</span>
+                    <span x-text="settings.temperature"></span>
+                    <span>Креативный (1)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Region & Time -->
+    <div class="bg-white p-6 rounded-[20px] soft-shadow">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-amber-100 rounded-[20px] flex items-center justify-center">
+                <span>🌍</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-900">Регион и время</h3>
+                <p class="text-sm text-gray-500">Локализация инстанса</p>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm text-gray-600 mb-2">Часовой пояс</label>
+                <select x-model="settings.timezone" class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                    <option value="Europe/Berlin">Europe/Berlin (CET)</option>
+                    <option value="Europe/Moscow">Europe/Moscow (MSK)</option>
+                    <option value="Europe/London">Europe/London (GMT)</option>
+                    <option value="America/New_York">America/New_York (EST)</option>
+                    <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm text-gray-600 mb-2">Язык интерфейса</label>
+                <select x-model="settings.language" class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm text-gray-600 mb-2">Формат даты</label>
+                <select x-model="settings.dateFormat" class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                    <option value="DD.MM.YYYY">DD.MM.YYYY</option>
+                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API Keys -->
+    <div class="bg-white p-6 rounded-[20px] soft-shadow">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-[20px] flex items-center justify-center">
+                    <span>🔑</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900">API Ключи</h3>
+                    <p class="text-sm text-gray-500">Хранятся локально, безопасно</p>
+                </div>
+            </div>
+            <button @click="showAddKey = true" class="px-4 py-2 bg-blue-600 text-white rounded-[20px] text-sm hover:bg-blue-700">
+                + Добавить
+            </button>
+        </div>
+        
+        <div class="space-y-3">
+            <template x-for="key in apiKeys" :key="key.id">
+                <div class="p-4 bg-gray-50 rounded-[20px] flex items-center justify-between">
+                    <div>
+                        <p class="font-medium text-gray-900" x-text="key.name"></p>
+                        <p class="text-xs text-gray-500" x-text="maskKey(key.value)"></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button @click="toggleKeyVisibility(key)" class="p-2 text-gray-400 hover:text-gray-600">
+                            👁️
+                        </button>
+                        <button @click="deleteKey(key)" class="p-2 text-gray-400 hover:text-red-600">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+    
+    <!-- Security -->
+    <div class="bg-white p-6 rounded-[20px] soft-shadow">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-red-100 rounded-[20px] flex items-center justify-center">
+                <span>🔒</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-900">Безопасность</h3>
+                <p class="text-sm text-gray-500">Доступ к дашборду</p>
+            </div>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-[20px]">
+                <div>
+                    <p class="font-medium text-gray-900">Пароль для дашборда</p>
+                    <p class="text-xs text-gray-500">Защита от несанкционированного доступа</p>
+                </div>
+                <button @click="showChangePassword = true" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-[20px] text-sm hover:bg-gray-300">
+                    Изменить
+                </button>
+            </div>
+            
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-[20px]">
+                <div>
+                    <p class="font-medium text-gray-900">Двухфакторная аутентификация</p>
+                    <p class="text-xs text-gray-500">Дополнительный уровень защиты</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input x-model="settings.twoFactor" type="checkbox" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Backup & Restore -->
+    <div class="bg-white p-6 rounded-[20px] soft-shadow">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-green-100 rounded-[20px] flex items-center justify-center">
+                <span>💾</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-900">Бэкап и восстановление</h3>
+                <p class="text-sm text-gray-500">Последний бэкап: сегодня 02:00</p>
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap gap-3">
+            <button @click="createBackup()" class="px-6 py-3 bg-green-600 text-white rounded-[20px] hover:bg-green-700 transition-colors flex items-center gap-2">
+                <span>💾</span>
+                <span>Создать бэкап</span>
+            </button>
+            
+            <button @click="showRestore = true" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-[20px] hover:bg-gray-200 transition-colors flex items-center gap-2">
+                <span>📥</span>
+                <span>Восстановить</span>
+            </button>
+            
+            <button @click="exportConfig()" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-[20px] hover:bg-gray-200 transition-colors flex items-center gap-2">
+                <span>📤</span>
+                <span>Экспорт настроек</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Save Button -->
+    <div class="flex justify-end gap-3">
+        <button @click="resetSettings()" class="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-[20px] transition-colors">
+            Сбросить
+        </button>
+        <button @click="saveSettings()" class="px-8 py-3 deya-gradient text-white rounded-[20px] hover:shadow-lg transition-all flex items-center gap-2">
+            <span>💾</span>
+            <span>Сохранить настройки</span>
+        </button>
+    </div>
+    
+    <!-- Change Password Modal -->
+    <div x-show="showChangePassword" 
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+         x-transition.opacity
+         @click.self="showChangePassword = false">
+        <div class="bg-white rounded-[20px] w-full max-w-md p-6 soft-shadow" x-transition.scale>
+            <h3 class="font-semibold text-gray-900 mb-4">Изменить пароль</h3>
+            
+            <div class="space-y-4">
+                <input x-model="passwordForm.current" type="password" placeholder="Текущий пароль"
+                       class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                <input x-model="passwordForm.new" type="password" placeholder="Новый пароль"
+                       class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                <input x-model="passwordForm.confirm" type="password" placeholder="Подтвердите пароль"
+                       class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+            </div>
+            
+            <div class="flex justify-end gap-2 mt-6">
+                <button @click="showChangePassword = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-[20px] text-sm">Отмена</button>
+                <button @click="changePassword()" class="px-6 py-2 deya-gradient text-white rounded-[20px] text-sm hover:shadow-lg">Сохранить</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add API Key Modal -->
+    <div x-show="showAddKey" 
+         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+         x-transition.opacity
+         @click.self="showAddKey = false">
+        <div class="bg-white rounded-[20px] w-full max-w-md p-6 soft-shadow" x-transition.scale>
+            <h3 class="font-semibold text-gray-900 mb-4">Добавить API ключ</h3>
+            
+            <div class="space-y-4">
+                <input x-model="newKey.name" type="text" placeholder="Название (например, OpenRouter)"
+                       class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500">
+                <input x-model="newKey.value" type="password" placeholder="API ключ"
+                       class="w-full px-4 py-3 rounded-[20px] bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500 font-mono text-sm">
+            </div>
+            
+            <div class="flex justify-end gap-2 mt-6">
+                <button @click="showAddKey = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-[20px] text-sm">Отмена</button>
+                <button @click="addKey()" class="px-6 py-2 deya-gradient text-white rounded-[20px] text-sm hover:shadow-lg">Добавить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function settingsApp() {
+    return {
+        showChangePassword: false,
+        showAddKey: false,
+        showRestore: false,
+        
+        settings: {
+            model: 'moonshot/kimi-k2.5',
+            temperature: 0.7,
+            timezone: 'Europe/Berlin',
+            language: 'ru',
+            dateFormat: 'DD.MM.YYYY',
+            twoFactor: false
+        },
+        
+        apiKeys: [
+            { id: 1, name: 'OpenRouter', value: 'sk-or-v1-1234567890abcdef', visible: false },
+            { id: 2, name: 'Telegram Bot', value: '1234567890:ABCdefGHIjklMNOpqrSTUvwxyz', visible: false }
+        ],
+        
+        passwordForm: {
+            current: '',
+            new: '',
+            confirm: ''
+        },
+        
+        newKey: {
+            name: '',
+            value: ''
+        },
+        
+        maskKey(key) {
+            if (!key) return '';
+            return key.slice(0, 8) + '...' + key.slice(-4);
+        },
+        
+        toggleKeyVisibility(key) {
+            key.visible = !key.visible;
+        },
+        
+        deleteKey(key) {
+            if (confirm('Удалить ключ?')) {
+                this.apiKeys = this.apiKeys.filter(k => k.id !== key.id);
+            }
+        },
+        
+        addKey() {
+            if (!this.newKey.name || !this.newKey.value) {
+                alert('Заполните все поля');
+                return;
+            }
+            
+            this.apiKeys.push({
+                id: Date.now(),
+                ...this.newKey,
+                visible: false
+            });
+            
+            this.showAddKey = false;
+            this.newKey = { name: '', value: '' };
+        },
+        
+        changePassword() {
+            if (this.passwordForm.new !== this.passwordForm.confirm) {
+                alert('Пароли не совпадают');
+                return;
+            }
+            
+            alert('Пароль изменен');
+            this.showChangePassword = false;
+            this.passwordForm = { current: '', new: '', confirm: '' };
+        },
+        
+        saveSettings() {
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.settings)
+            })
+            .then(() => alert('Настройки сохранены'))
+            .catch(err => alert('Ошибка: ' + err));
+        },
+        
+        resetSettings() {
+            if (confirm('Сбросить все настройки?')) {
+                location.reload();
+            }
+        },
+        
+        createBackup() {
+            alert('Создание бэкапа...');
+        },
+        
+        exportConfig() {
+            const data = JSON.stringify(this.settings, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'deya-settings.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    }
+}
+</script>
+{% endblock %}

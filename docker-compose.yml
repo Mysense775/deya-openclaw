@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  deya-instance:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: deya/openclaw-instance:latest
+    container_name: deya-instance
+    
+    ports:
+      - "8000:8000"    # OpenClaw Gateway API
+      - "8001:8001"    # Deya Dashboard
+    
+    volumes:
+      # Persist memory and workspace
+      - deya-memory:/home/openclaw/.openclaw/workspace/memory
+      - deya-logs:/home/openclaw/.openclaw/logs
+      
+      # Optional: mount custom config
+      # - ./config.yaml:/home/openclaw/.openclaw/config.yaml:ro
+      
+      # Optional: mount local skills for development
+      # - ./skills/:/home/openclaw/.openclaw/workspace/skills/:ro
+    
+    environment:
+      - TZ=Europe/Berlin
+      - OPENCLAW_MODEL=moonshot/kimi-k2.5
+      - DEYA_MODE=active
+      - DASHBOARD_HOST=0.0.0.0
+      - DASHBOARD_PORT=8001
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    networks:
+      - deya-network
+
+  # Optional: Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: deya-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - deya-instance
+    restart: unless-stopped
+    networks:
+      - deya-network
+    profiles:
+      - with-nginx
+
+volumes:
+  deya-memory:
+    driver: local
+  deya-logs:
+    driver: local
+
+networks:
+  deya-network:
+    driver: bridge

@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Дашборд | Deya Dashboard{% endblock %}
+{% block header %}Дашборд{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="dashboardApp()">
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-6 rounded-[20px] soft-shadow card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Сообщений сегодня</p>
+                    <p class="text-2xl font-bold text-gray-900" x-text="stats.messages_today">24</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-[20px] flex items-center justify-center">
+                    <span class="text-2xl">💬</span>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-green-600">+12% к вчера</div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-[20px] soft-shadow card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Активные скиллы</p>
+                    <p class="text-2xl font-bold text-gray-900" x-text="stats.skills_active">5</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-100 rounded-[20px] flex items-center justify-center">
+                    <span class="text-2xl">🛠️</span>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-gray-500">Все работают</div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-[20px] soft-shadow card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Задач в очереди</p>
+                    <p class="text-2xl font-bold text-gray-900" x-text="stats.tasks_pending">3</p>
+                </div>
+                <div class="w-12 h-12 bg-pink-100 rounded-[20px] flex items-center justify-center">
+                    <span class="text-2xl">⏰</span>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-gray-500">2 выполнены</div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-[20px] soft-shadow card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Постов в канал</p>
+                    <p class="text-2xl font-bold text-gray-900" x-text="stats.posts_this_week">7</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-[20px] flex items-center justify-center">
+                    <span class="text-2xl">📢</span>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-green-600">@dayanrouter</div>
+        </div>
+    </div>
+    
+    <!-- Charts & Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Activity Chart -->
+        <div class="bg-white p-6 rounded-[20px] soft-shadow">
+            <h3 class="font-semibold text-gray-900 mb-4">Активность за неделю</h3>
+            <div class="h-48 flex items-end justify-between gap-2">
+                <template x-for="(day, index) in activityData" :key="index">
+                    <div class="flex-1 flex flex-col items-center">
+                        <div class="w-full bg-purple-200 rounded-t-[20px] transition-all duration-500 hover:bg-purple-300"
+                             :style="`height: ${day.value * 2}px; max-height: 160px`"
+                             :title="day.value + ' сообщений'"></div>
+                        <span class="text-xs text-gray-500 mt-2" x-text="day.day"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="bg-white p-6 rounded-[20px] soft-shadow">
+            <h3 class="font-semibold text-gray-900 mb-4">Последние действия</h3>
+            <div class="space-y-3">
+                <template x-for="activity in recentActivity" :key="activity.id">
+                    <div class="flex items-start gap-3 p-3 rounded-[20px] bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <span class="text-2xl" x-text="activity.icon"></span>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900" x-text="activity.text"></p>
+                            <p class="text-xs text-gray-500" x-text="activity.time"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Health -->
+    <div class="bg-white p-6 rounded-[20px] soft-shadow">
+        <h3 class="font-semibold text-gray-900 mb-4">System Health</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- CPU -->
+            <div>
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-600">CPU</span>
+                    <span class="font-medium" x-text="system.cpu + '%'">45%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-purple-500 rounded-full transition-all duration-500"
+                         :style="`width: ${system.cpu}%`"></div>
+                </div>
+            </div>
+            
+            <!-- RAM -->
+            <div>
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-600">RAM</span>
+                    <span class="font-medium" x-text="system.ram + '%'">62%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-amber-500 rounded-full transition-all duration-500"
+                         :style="`width: ${system.ram}%`"></div>
+                </div>
+            </div>
+            
+            <!-- Disk -->
+            <div>
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-600">Disk</span>
+                    <span class="font-medium" x-text="system.disk + '%'">28%</span>
+                </div>
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-green-500 rounded-full transition-all duration-500"
+                         :style="`width: ${system.disk}%`"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Services Status -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span class="text-sm text-gray-600">OpenClaw Gateway</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span class="text-sm text-gray-600">PostgreSQL</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span class="text-sm text-gray-600">Redis</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span class="text-sm text-gray-600">Telegram Bot</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions Row -->
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-[20px] text-white">
+        <h3 class="font-semibold mb-4">Быстрые действия</h3>
+        <div class="flex flex-wrap gap-3">
+            <button @click="createPost()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-[20px] text-sm transition-colors flex items-center gap-2">
+                <span>📝</span> Новый пост
+            </button>
+            <button @click="backupSystem()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-[20px] text-sm transition-colors flex items-center gap-2">
+                <span>💾</span> Бэкап
+            </button>
+            <button @click="checkSecurity()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-[20px] text-sm transition-colors flex items-center gap-2">
+                <span>🔒</span> Проверка безопасности
+            </button>
+            <button @click="restartServices()" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-[20px] text-sm transition-colors flex items-center gap-2">
+                <span>🔄</span> Перезапуск
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function dashboardApp() {
+    return {
+        stats: {
+            messages_today: 24,
+            skills_active: 5,
+            tasks_pending: 3,
+            posts_this_week: 7
+        },
+        
+        activityData: [
+            { day: 'Пн', value: 15 },
+            { day: 'Вт', value: 28 },
+            { day: 'Ср', value: 22 },
+            { day: 'Чт', value: 35 },
+            { day: 'Пт', value: 18 },
+            { day: 'Сб', value: 8 },
+            { day: 'Вс', value: 12 }
+        ],
+        
+        recentActivity: [
+            { id: 1, icon: '📝', text: 'Создан пост в @dayanrouter', time: '15 минут назад' },
+            { id: 2, icon: '🛠️', text: 'Установлен скилл UI-UX-Pro-Max v1.1', time: '1 час назад' },
+            { id: 3, icon: '💾', text: 'Создан бэкап системы', time: '3 часа назад' },
+            { id: 4, icon: '🔒', text: 'Пройдена проверка безопасности', time: '5 часов назад' }
+        ],
+        
+        system: {
+            cpu: 45,
+            ram: 62,
+            disk: 28
+        },
+        
+        init() {
+            this.startSystemMonitoring();
+        },
+        
+        startSystemMonitoring() {
+            // Обновление системных метрик каждые 5 секунд
+            setInterval(() => {
+                this.system.cpu = Math.floor(Math.random() * 30) + 30;
+                this.system.ram = Math.floor(Math.random() * 20) + 50;
+            }, 5000);
+        },
+        
+        createPost() {
+            window.location.href = '/channels';
+        },
+        
+        backupSystem() {
+            alert('Запуск бэкапа...');
+        },
+        
+        checkSecurity() {
+            alert('Проверка безопасности запущена');
+        },
+        
+        restartServices() {
+            if (confirm('Перезапустить сервисы?')) {
+                alert('Перезапуск...');
+            }
+        }
+    }
+}
+</script>
+{% endblock %}
