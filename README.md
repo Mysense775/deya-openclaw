@@ -250,7 +250,7 @@ MIT License — свободное использование и модифик�
 
 ## 💬 Связь
 
-- 🌐 Сайт: https://deya.ai
+- 🌐 Сайт: https://go.airouter.host
 - 💬 Telegram: [@dayanrouter](https://t.me/dayanrouter)
 - 🐙 GitHub: [@Mysense775](https://github.com/Mysense775)
 
