@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deya Cloud — Арендуй свою Дею</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-text { background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gradient-bg { background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .soft-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .rounded-soft { border-radius: 24px; }
+        .blob {
+            position: absolute;
+            filter: blur(40px);
+            opacity: 0.4;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 overflow-x-hidden">
+    
+    <!-- Background Blobs -->
+    <div class="blob w-72 h-72 bg-purple-300 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="blob w-96 h-96 bg-pink-300 rounded-full top-1/3 right-0 translate-x-1/2" style="animation-delay: 2s;"></div>
+    <div class="blob w-64 h-64 bg-amber-300 rounded-full bottom-0 left-1/4" style="animation-delay: 4s;"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🌺</span>
+                    <span class="font-bold text-xl">Deya Cloud</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#features" class="text-gray-600 hover:text-gray-900">Возможности</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-gray-900">Тарифы</a>
+                    <a href="#demo" class="text-gray-600 hover:text-gray-900">Демо</a>
+                    <a href="https://github.com/Mysense775/deya-openclaw" class="text-gray-600 hover:text-gray-900">GitHub</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="#pricing" class="hidden md:block text-gray-600 hover:text-gray-900">Войти</a>
+                    <a href="#pricing" class="gradient-bg text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition-all">
+                        Начать бесплатно
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-full text-purple-700 text-sm font-medium mb-6">
+                    <span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+                    Новый релиз v1.0 — уже доступен
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Арендуй свою <span class="gradient-text">Дею</span><br>
+                    <span class="text-gray-400 text-3xl md:text-5xl font-normal">в облаке</span>
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Персональный AI-агент с характером. Помогает с задачами, пишет посты, 
+                    исследует веб и управляет проектами. Тёплый свет, не неоновое сияние.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#pricing" class="gradient-bg text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                        <span>Попробовать 7 дней бесплатно</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#demo" class="bg-white text-gray-700 px-8 py-4 rounded-full font-semibold text-lg border border-gray-200 hover:border-gray-300 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-play"></i>
+                        <span>Смотреть демо</span>
+                    </a>
+                </div>
+                <div class="mt-8 flex items-center justify-center gap-8 text-sm text-gray-500">
+                    <span class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Без карты</span>
+                    <span class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> Отмена в любой момент</span>
+                    <span class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> 6 скиллов включено</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 bg-white border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold gradient-text mb-2">500+</div>
+                    <div class="text-gray-600">Активных пользователей</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold gradient-text mb-2">50K+</div>
+                    <div class="text-gray-600">Сообщений в месяц</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold gradient-text mb-2">6</div>
+                    <div class="text-gray-600">Готовых скиллов</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold gradient-text mb-2">99.9%</div>
+                    <div class="text-gray-600">Uptime</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 lg:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Возможности Деи</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Не просто чат-бот. Полноценный цифровой помощник с собственным характером и навыками.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-8 rounded-soft soft-shadow card-hover">
+                    <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-2xl mb-4">🧠</div>
+                    <h3 class="text-xl font-semibold mb-2">Персона с характером</h3>
+                    <p class="text-gray-600">Дух-хранитель с Бали. Мягко говорит, но по делу. Ноль терпимости к токсичности.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="bg-white p-8 rounded-soft soft-shadow card-hover">
+                    <div class="w-14 h-14 bg-pink-100 rounded-2xl flex items-center justify-center text-2xl mb-4">🎨</div>
+                    <h3 class="text-xl font-semibold mb-2">UI/UX генератор</h3>
+                    <p class="text-gray-600">Создаёт красивые React-компоненты с GSAP-анимациями по описанию.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="bg-white p-8 rounded-soft soft-shadow card-hover">
+                    <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center text-2xl mb-4">⚔️</div>
+                    <h3 class="text-xl font-semibold mb-2">Code Ninja</h3>
+                    <p class="text-gray-600">Анализирует код, находит баги, предлагает рефакторинг. Поддерживает Python, JS, Go.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="bg-white p-8 rounded-soft soft-shadow card-hover">
+                    <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-2xl mb-4">🕸️</div>
+                    <h3 class="text-xl font-semibold mb-2">Web Hunter</h3>
+                    <p class="text-gray-600">Собирает данные из интернета, парсит сайты, мониторит цены, ищет контакты.</p>
+                </div>
+                <!-- Feature 5 -->
+                <div class="bg-white p-8 rounded-soft soft-shadow card-hover">
+                    <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-2xl mb-4">📢</div>
+                    <h3 class="text-xl font-semibold mb-2">Автопостинг</h3>
+                    <p class="text-gray-600">Пишет и публикует посты в Telegram, управляет каналом, анализирует статистику.</p>
+                </div>
+                <!-- Feature 6 -->
+                <div class="bg-white p-8 rounded-soft soft-shadow card-hover">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center text-2xl mb-4">🎛️</div>
+                    <h3 class="text-xl font-semibold mb-2">Веб-дашборд</h3>
+                    <p class="text-gray-600">Удобный интерфейс управления. Чат, статистика, настройки, память — всё в одном месте.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 lg:py-32 bg-gray-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-900/50 to-pink-900/50"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Простые тарифы</h2>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                    Начни бесплатно. Масштабируйся по мере роста.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Starter -->
+                <div class="bg-gray-800 rounded-soft p-8 border border-gray-700 card-hover">
+                    <div class="text-sm text-gray-400 mb-2">🌱 Starter</div>
+                    <div class="text-4xl font-bold mb-2">$9<span class="text-lg text-gray-400">/мес</span></div>
+                    <p class="text-gray-400 mb-6">Для знакомства с Деей</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> 1 инстанс Деи</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> 500 сообщений/мес</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> 3 базовых скилла</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> Веб-чат</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> Email поддержка</li>
+                    </ul>
+                    <button class="w-full py-3 border border-gray-600 rounded-full hover:bg-gray-700 transition-all">
+                        Начать бесплатно
+                    </button>
+                </div>
+                <!-- Pro -->
+                <div class="gradient-bg rounded-soft p-8 relative transform md:scale-105 shadow-2xl">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-purple-600 px-4 py-1 rounded-full text-sm font-semibold">
+                        Популярный
+                    </div>
+                    <div class="text-sm text-white/80 mb-2">🌿 Pro</div>
+                    <div class="text-4xl font-bold mb-2">$29<span class="text-lg text-white/70">/мес</span></div>
+                    <p class="text-white/80 mb-6">Для фрилансеров и бизнеса</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-white"></i> 1 инстанс Деи</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-white"></i> Безлимитные сообщения</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-white"></i> Все 6 скиллов</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-white"></i> Веб-дашборд + API</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-white"></i> Telegram интеграция</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-white"></i> Приоритетная поддержка</li>
+                    </ul>
+                    <button class="w-full py-3 bg-white text-purple-600 rounded-full font-semibold hover:shadow-lg transition-all">
+                        Выбрать Pro
+                    </button>
+                </div>
+                <!-- Team -->
+                <div class="bg-gray-800 rounded-soft p-8 border border-gray-700 card-hover">
+                    <div class="text-sm text-gray-400 mb-2">🌳 Team</div>
+                    <div class="text-4xl font-bold mb-2">$79<span class="text-lg text-gray-400">/мес</span></div>
+                    <p class="text-gray-400 mb-6">Для команд и агентств</p>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> 3 инстанса Деи</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> Безлимитные сообщения</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> Все скиллы + кастомные</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> Полный API доступ</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> Все интеграции</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-green-400"></i> Персональный менеджер</li>
+                    </ul>
+                    <button class="w-full py-3 border border-gray-600 rounded-full hover:bg-gray-700 transition-all">
+                        Связаться с нами
+                    </button>
+                </div>
+            </div>
+            <div class="text-center mt-12 text-gray-400">
+                💡 Нужно больше? <a href="#" class="text-white underline">Enterprise решения</a> от $299/мес
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-6">Готова познакомиться с Деей?</h2>
+            <p class="text-xl text-gray-600 mb-8">
+                7 дней бесплатно. Без карты. Без обязательств. Просто поговори с Деей и реши, подходит ли она тебе.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#pricing" class="gradient-bg text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transition-all">
+                    Начать бесплатно 🌺
+                </a>
+            </div>
+            <p class="mt-4 text-sm text-gray-500">
+                <i class="fas fa-shield-alt mr-1"></i> Безопасная оплата через Stripe. Отмена в любой момент.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 text-white mb-4">
+                        <span class="text-2xl">🌺</span>
+                        <span class="font-bold text-xl">Deya Cloud</span>
+                    </div>
+                    <p class="text-sm">
+                        Персональные AI-агенты с характером. Тёплый свет, не неоновое сияние.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Продукт</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#features" class="hover:text-white">Возможности</a></li>
+                        <li><a href="#pricing" class="hover:text-white">Тарифы</a></li>
+                        <li><a href="#" class="hover:text-white">Документация</a></li>
+                        <li><a href="#" class="hover:text-white">API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Компания</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white">О нас</a></li>
+                        <li><a href="#" class="hover:text-white">Блог</a></li>
+                        <li><a href="#" class="hover:text-white">Карьера</a></li>
+                        <li><a href="#" class="hover:text-white">Контакты</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Сообщество</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="https://t.me/dayanrouter" class="hover:text-white">Telegram</a></li>
+                        <li><a href="https://github.com/Mysense775/deya-openclaw" class="hover:text-white">GitHub</a></li>
+                        <li><a href="#" class="hover:text-white">Discord</a></li>
+                        <li><a href="#" class="hover:text-white">Twitter</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm">© 2026 Deya Cloud. Все права защищены.</p>
+                <div class="flex gap-6 text-sm">
+                    <a href="#" class="hover:text-white">Privacy Policy</a>
+                    <a href="#" class="hover:text-white">Terms of Service</a>
+                    <a href="#" class="hover:text-white">Refund Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
