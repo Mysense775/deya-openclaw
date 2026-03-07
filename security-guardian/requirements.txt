@@ -1,0 +1,6 @@
+# Security dependencies
+python-dateutil>=2.8.2
+requests>=2.31.0
+
+# For email alerts (optional)
+# secure-smtplib>=0.1.1
